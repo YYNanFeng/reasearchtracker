@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["id", "type", "experiment", "status", "claim", "evidence", "created"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^result-" },
+    "type": { "type": "string", "const": "result" },
+    "experiment": { "type": "string", "pattern": "^exp-" },
+    "status": { "type": "string", "enum": ["success", "failed"] },
+    "claim": { "type": "string" },
+    "evidence": { "type": "string" },
+    "metrics": { "type": "object", "additionalProperties": { "type": "number" } },
+    "created": { "type": "string", "format": "date" }
+  },
+  "additionalProperties": false
+}

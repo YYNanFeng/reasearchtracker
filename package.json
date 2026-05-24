@@ -1,0 +1,51 @@
+{
+  "name": "@nanfen/researchtracker",
+  "version": "0.1.1",
+  "description": "Research tracking CLI with MCP server support — 面向深度学习研究者的科研过程管理工具",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "research": "dist/bin/research.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc && rm -rf dist/schemas && cp -r src/schemas dist/schemas",
+    "dev": "tsc --watch",
+    "test": "vitest run",
+    "lint": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "research",
+    "cli",
+    "mcp",
+    "experiment-tracking",
+    "deep-learning",
+    "paper-management"
+  ],
+  "author": "YYNanFeng",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YYNanFeng/reasearchtracker",
+    "directory": "packages/researchtracker"
+  },
+  "homepage": "https://github.com/YYNanFeng/reasearchtracker#readme",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
+    "commander": "^13.1.0",
+    "glob": "^11.0.2",
+    "gray-matter": "^4.0.3",
+    "yaml": "^2.7.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.50",
+    "typescript": "^5.8.3",
+    "vitest": "^3.1.4"
+  }
+}

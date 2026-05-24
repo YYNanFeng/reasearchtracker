@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["id", "type", "status", "idea", "created"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^exp-" },
+    "type": { "type": "string", "const": "experiment" },
+    "status": { "type": "string", "enum": ["planned", "running", "completed", "failed", "cancelled"] },
+    "idea": { "type": "string", "pattern": "^idea-" },
+    "created": { "type": "string", "format": "date" },
+    "purpose": { "type": "string" },
+    "based_on": { "type": "string", "pattern": "^exp-" },
+    "commits": { "type": "array", "items": { "type": "string" } },
+    "tags": { "type": "array", "items": { "type": "string" } },
+    "updated": { "type": "string", "format": "date" }
+  },
+  "additionalProperties": false
+}

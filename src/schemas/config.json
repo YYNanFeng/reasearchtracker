@@ -1,0 +1,313 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ResearchTracker Project Config",
+  "description": "Schema for .research/config.yaml",
+  "type": "object",
+  "required": ["version"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "enum": ["1", "2"],
+      "description": "Config version. '1' = backward compatible (ignore v2 features), '2' = full config capabilities"
+    },
+    "statusFlow": {
+      "type": "object",
+      "description": "Status transition rules for entities",
+      "properties": {
+        "idea": {
+          "$ref": "#/$defs/entityStatusConfig"
+        },
+        "experiment": {
+          "$ref": "#/$defs/entityStatusConfig"
+        }
+      },
+      "additionalProperties": false
+    },
+    "fields": {
+      "type": "object",
+      "description": "Field constraints per entity type",
+      "properties": {
+        "idea": { "$ref": "#/$defs/fieldRules" },
+        "experiment": { "$ref": "#/$defs/fieldRules" },
+        "result": { "$ref": "#/$defs/fieldRules" },
+        "reference": { "$ref": "#/$defs/fieldRules" },
+        "log": { "$ref": "#/$defs/fieldRules" }
+      },
+      "additionalProperties": false
+    },
+    "metrics": {
+      "type": "object",
+      "description": "Metrics constraints for experiment results",
+      "properties": {
+        "requiredKeys": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Metric keys that must be present when result status is success"
+        },
+        "optionalKeys": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Optional metric keys (for documentation and AI hints)"
+        },
+        "ranges": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "min": { "type": "number" },
+              "max": { "type": "number" }
+            },
+            "additionalProperties": false
+          },
+          "description": "Expected ranges for metric keys (produces warnings, not errors)"
+        }
+      },
+      "additionalProperties": false
+    },
+    "relations": {
+      "type": "object",
+      "description": "Custom relation types",
+      "properties": {
+        "idea": {
+          "type": "object",
+          "properties": {
+            "builtIn": {
+              "type": "boolean",
+              "default": true,
+              "description": "Whether to keep the 6 built-in relation types"
+            },
+            "custom": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Custom relation types to add alongside built-in ones"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "numbering": {
+      "type": "object",
+      "description": "Experiment numbering strategy",
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": ["global", "per-idea"],
+          "default": "global",
+          "description": "'global' = shared sequence across all ideas, 'per-idea' = independent sequence per idea"
+        }
+      },
+      "additionalProperties": false
+    },
+    "git": {
+      "type": "object",
+      "description": "Git integration settings",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether to enable Git integration"
+        },
+        "autoAttachCommitOnStatus": {
+          "type": "object",
+          "additionalProperties": { "type": "boolean" },
+          "description": "Auto-attach HEAD commit when entering a status. Default: { running: true }"
+        }
+      },
+      "additionalProperties": false
+    },
+    "customFields": {
+      "type": "object",
+      "description": "Custom frontmatter field definitions",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether to allow additional frontmatter fields beyond the schema"
+        },
+        "schema": {
+          "type": "object",
+          "properties": {
+            "idea": { "$ref": "#/$defs/customFieldDefs" },
+            "experiment": { "$ref": "#/$defs/customFieldDefs" },
+            "result": { "$ref": "#/$defs/customFieldDefs" },
+            "reference": { "$ref": "#/$defs/customFieldDefs" }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "output": {
+      "type": "object",
+      "description": "Output format settings",
+      "properties": {
+        "defaultFormat": {
+          "type": "string",
+          "enum": ["markdown", "json", "table"],
+          "default": "markdown"
+        },
+        "timezone": {
+          "type": "string",
+          "description": "IANA timezone identifier (e.g. 'Asia/Shanghai')"
+        }
+      },
+      "additionalProperties": false
+    },
+    "hooks": {
+      "type": "object",
+      "description": "Workflow automation hooks",
+      "properties": {
+        "onIdeaStatusChange": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/statusChangeRule" }
+        },
+        "onExperimentStatusChange": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/statusChangeRule" }
+        },
+        "onResultCreated": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/resultCreatedRule" }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+
+  "$defs": {
+    "entityStatusConfig": {
+      "type": "object",
+      "properties": {
+        "initial": {
+          "type": "string",
+          "description": "Default status when creating a new entity"
+        },
+        "transitions": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "description": "Allowed transitions: { from_status: [to_status, ...] }. Empty array = terminal state."
+        }
+      },
+      "additionalProperties": false
+    },
+    "fieldRules": {
+      "type": "object",
+      "properties": {
+        "required": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Additional required fields (appended to built-in required fields)"
+        },
+        "defaults": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Default values for fields (auto-filled on creation)"
+        }
+      },
+      "additionalProperties": false
+    },
+    "customFieldDefs": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["string", "number", "boolean"],
+            "description": "Value type for the custom field"
+          },
+          "description": {
+            "type": "string",
+            "description": "Human-readable description (used by AI agents and CLI help)"
+          }
+        },
+        "required": ["type"],
+        "additionalProperties": false
+      }
+    },
+    "statusChangeRule": {
+      "type": "object",
+      "required": ["to", "actions"],
+      "properties": {
+        "to": {
+          "type": "string",
+          "description": "Target status to match"
+        },
+        "timing": {
+          "type": "string",
+          "enum": ["before", "after"],
+          "default": "after",
+          "description": "'before' = pre-validation (can block), 'after' = post-trigger"
+        },
+        "actions": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/action" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "resultCreatedRule": {
+      "type": "object",
+      "required": ["actions"],
+      "properties": {
+        "condition": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "description": "Match result status"
+            }
+          },
+          "additionalProperties": false
+        },
+        "actions": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/action" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "action": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["update-field", "create-entity", "add-log"]
+        }
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "type": { "const": "update-field" },
+            "target": { "type": "string", "enum": ["idea", "experiment"] },
+            "locateBy": { "type": "string", "enum": ["self", "parent", "related"] },
+            "updates": { "type": "object", "additionalProperties": true }
+          },
+          "required": ["type", "target", "locateBy", "updates"]
+        },
+        {
+          "properties": {
+            "type": { "const": "create-entity" },
+            "entityType": { "type": "string", "enum": ["log"] },
+            "template": { "type": "string" }
+          },
+          "required": ["type", "entityType", "template"]
+        },
+        {
+          "properties": {
+            "type": { "const": "add-log" },
+            "template": { "type": "string" }
+          },
+          "required": ["type", "template"]
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["name", "researchQuestion", "status", "created"],
+  "properties": {
+    "name": { "type": "string" },
+    "researchQuestion": { "type": "string" },
+    "status": { "type": "string", "enum": ["active", "completed", "archived"] },
+    "created": { "type": "string", "format": "date" }
+  },
+  "additionalProperties": false
+}
